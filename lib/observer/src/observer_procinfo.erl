@@ -248,35 +248,35 @@ init_state_page(Parent, Pid) ->
 			  {proc_lib,init_p,5} -> Misc = [] ;
 			  % May be a gen process
 			  {M, _F, _A} ->  % Get the behavio(u)r
-					    I = rpc:call(node(Pid), M, module_info, [attributes]),
-					    case lists:keyfind(behaviour, 1, I) of
+		    			I = rpc:call(node(Pid), M, module_info, [attributes]),
+					case lists:keyfind(behaviour, 1, I) of
 						false -> case lists:keyfind(behavior, 1, I) of
 								false         -> B = undefined ;
 								{behavior, [B]} -> B
 							   end;
 						{behaviour, [B]} -> B
-					    end,
-					    % but not sure that system messages are treated by this process
-			  		    % so using a rpc with a small timeout in order not to lag the display
-					    case rpc:call(node(Pid), sys, get_status, [Pid, 200])
-		     			    of
-			 			{status, _, {module, _}, [_PDict, _SysState, _Parent, _Dbg, 
-						   [Header,{data, First},{data, Second}]]} ->
-			      			Misc = [{"Behaviour", B}] ++ [Header] ++ First ++ Second;
-			      		        {status, _, {module, _}, [_PDict, _SysState, _Parent, _Dbg, 
-						   [Header,{data, First}, OtherFormat]]} ->
-			      			Misc = [{"Behaviour", B}] ++ [Header] ++ First ++ [{"State",OtherFormat}] ;
-			      		        {status, _, {module, _}, [_PDict, _SysState, _Parent, _Dbg, 
-						   OtherFormat]} ->
-							% Formatted status ?
-							case lists:keyfind(format_status, 1, rpc:call(node(Pid), M, module_info, [exports])) of
-								false -> Opt = {"Format", unknown} ;
-								_     -> Opt = {"Format", overriden}
-							end,
-			      			        Misc = [{"Behaviour", B}] ++ [Opt, {"State",OtherFormat}] ;
-			      		        {badrpc,{'EXIT',{timeout, _}}} -> 
-							Misc = [{"State",timed_out}, {"Tip","system messages are certainly not treated by this process"}] 
-					   end ;
+					end,
+					% but not sure that system messages are treated by this process
+			  		% so using a rpc with a small timeout in order not to lag the display
+					case rpc:call(node(Pid), sys, get_status, [Pid, 200])
+					of
+						{status, _, {module, _}, [_PDict, _SysState, _Parent, _Dbg, 
+							[Header,{data, First},{data, Second}]]} ->
+								Misc = [{"Behaviour", B}] ++ [Header] ++ First ++ Second;
+						{status, _, {module, _}, [_PDict, _SysState, _Parent, _Dbg, 
+							[Header,{data, First}, OtherFormat]]} ->
+								Misc = [{"Behaviour", B}] ++ [Header] ++ First ++ [{"State",OtherFormat}] ;
+						{status, _, {module, _}, [_PDict, _SysState, _Parent, _Dbg, 
+							OtherFormat]} ->
+								% Formatted status ?
+								case lists:keyfind(format_status, 1, rpc:call(node(Pid), M, module_info, [exports])) of
+									false -> Opt = {"Format", unknown} ;
+									_     -> Opt = {"Format", overriden}
+								end,
+								Misc = [{"Behaviour", B}] ++ [Opt, {"State",OtherFormat}] ;
+						{badrpc,{'EXIT',{timeout, _}}} -> 
+								Misc = [{"State",timed_out}, {"Tip","system messages are certainly not treated by this process"}] 
+					end ;
 			  _ -> Misc=[], throw(process_undefined)	     
 		     end,			
 		     Dict = [io_lib:format("~-20.s ~p~n", [K, V]) || {K, V} <- Misc],							
