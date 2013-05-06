@@ -263,18 +263,18 @@ init_state_page(Parent, Pid) ->
 			 			{status, _, {module, _}, [_PDict, _SysState, _Parent, _Dbg, 
 						   [Header,{data, First},{data, Second}]]} ->
 			      			Misc = [{"Behaviour", B}] ++ [Header] ++ First ++ Second;
-			      		{status, _, {module, _}, [_PDict, _SysState, _Parent, _Dbg, 
+			      		        {status, _, {module, _}, [_PDict, _SysState, _Parent, _Dbg, 
 						   [Header,{data, First}, OtherFormat]]} ->
 			      			Misc = [{"Behaviour", B}] ++ [Header] ++ First ++ [{"State",OtherFormat}] ;
-			      		{status, _, {module, _}, [_PDict, _SysState, _Parent, _Dbg, 
+			      		        {status, _, {module, _}, [_PDict, _SysState, _Parent, _Dbg, 
 						   OtherFormat]} ->
 							% Formatted status ?
 							case lists:keyfind(format_status, 1, rpc:call(node(Pid), M, module_info, [exports])) of
 								false -> Opt = {"Format", unknown} ;
 								_     -> Opt = {"Format", overriden}
 							end,
-			      			Misc = [{"Behaviour", B}] ++ [Opt, {"State",OtherFormat}] ;
-			      		{badrpc,{'EXIT',{timeout, _}}} -> 
+			      			        Misc = [{"Behaviour", B}] ++ [Opt, {"State",OtherFormat}] ;
+			      		        {badrpc,{'EXIT',{timeout, _}}} -> 
 							Misc = [{"State",timed_out}, {"Tip","system messages are certainly not treated by this process"}] 
 					   end ;
 			  _ -> Misc=[], throw(process_undefined)	     
