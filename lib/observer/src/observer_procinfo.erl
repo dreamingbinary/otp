@@ -241,13 +241,13 @@ init_stack_page(Parent, Pid) ->
 init_state_page(Parent, Pid) ->     
     Text = init_text_page(Parent),
 	Update = fun() ->
-		     % First, test if sys:get_status/2 have any chance to return an answer
-		     case rpc:call(node(Pid), proc_lib, translate_initial_call, [Pid])
-		     of
-			  % Not a gen process
-			  {proc_lib,init_p,5} -> Misc = [] ;
-			  % May be a gen process
-			  {M, _F, _A} ->  % Get the behavio(u)r
+			% First, test if sys:get_status/2 have any chance to return an answer
+			case rpc:call(node(Pid), proc_lib, translate_initial_call, [Pid])
+			of
+			% Not a gen process
+			{proc_lib,init_p,5} -> Misc = [] ;
+			% May be a gen process
+			{M, _F, _A} ->  % Get the behavio(u)r
 		    			I = rpc:call(node(Pid), M, module_info, [attributes]),
 					case lists:keyfind(behaviour, 1, I) of
 						false -> case lists:keyfind(behavior, 1, I) of
@@ -277,14 +277,14 @@ init_state_page(Parent, Pid) ->
 						{badrpc,{'EXIT',{timeout, _}}} -> 
 								Misc = [{"State",timed_out}, {"Tip","system messages are certainly not treated by this process"}] 
 					end ;
-			  _ -> Misc=[], throw(process_undefined)	     
-		     end,			
-		     Dict = [io_lib:format("~-20.s ~p~n", [K, V]) || {K, V} <- Misc],							
-		     Last = wxTextCtrl:getLastPosition(Text),
-		     wxTextCtrl:remove(Text, 0, Last),
-		     wxTextCtrl:writeText(Text, Dict)
-	     end,
-    	Update(),
+			_ -> Misc=[], throw(process_undefined)
+			end,			
+			Dict = [io_lib:format("~-20.s ~p~n", [K, V]) || {K, V} <- Misc],
+			Last = wxTextCtrl:getLastPosition(Text),
+			wxTextCtrl:remove(Text, 0, Last),
+			wxTextCtrl:writeText(Text, Dict)
+	end,
+	Update(),
 	{Text, Update}.
 
 
