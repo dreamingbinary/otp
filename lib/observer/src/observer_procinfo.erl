@@ -270,8 +270,8 @@ init_state_page(Parent, Pid) ->
 						OtherFormat]} ->
 							% Formatted status ?
 							case lists:keyfind(format_status, 1, rpc:call(node(Pid), M, module_info, [exports])) of
-								false -> Opt = {"Format", unknown} ;
-								_     -> Opt = {"Format", overriden}
+								false	-> Opt = {"Format", unknown} ;
+								_	-> Opt = {"Format", overriden}
 							end,
 							Misc = [{"Behaviour", B}] ++ [Opt, {"State",OtherFormat}] ;
 					{badrpc,{'EXIT',{timeout, _}}} -> 
