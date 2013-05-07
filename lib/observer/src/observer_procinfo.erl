@@ -66,7 +66,6 @@ init([Pid, ParentFrame, Parent]) ->
 	StackPage   = init_panel(Notebook, "Stack Trace", Pid, fun init_stack_page/2),
 	StatePage   = init_panel(Notebook, "State", Pid, fun init_state_page/2),
 
-
 	wxFrame:connect(Frame, close_window),
 	wxMenu:connect(Frame, command_menu_selected),
 	%% wxNotebook:connect(Notebook, command_notebook_page_changed, [{skip,true}]),
@@ -253,7 +252,7 @@ init_state_page(Parent, Pid) ->
 						false -> case lists:keyfind(behavior, 1, I) of
 								false		-> B = undefined ;
 								{behavior, [B]}	-> B
-							 end;
+							end;
 						{behaviour, [B]} -> B
 					end,
 					% but not sure that system messages are treated by this process
